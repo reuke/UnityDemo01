@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Card
 {
-    public const float Width = 0.063f;
-    public const float Height = 0.088f;
+    public const float Width = 63f;
+    public const float Height = 88f;
 
     private GameObject quadGameObject;
     private Material material;
@@ -50,6 +50,7 @@ public class Card
 
         quadGameObject = new GameObject();
         material = new Material(Shader.Find("CardShader"));
+        material.EnableKeyword("_MainTex");
 
         var meshRenderer = quadGameObject.AddComponent<MeshRenderer>();
         meshRenderer.material = material;
@@ -71,7 +72,6 @@ public class Card
     }
     public void SetTexture(Texture texture)
     {
-        material.EnableKeyword("_BaseMap");
-        material.SetTexture("_BaseMap", texture);
+        material.SetTexture("_MainTex", texture);
     }
 }

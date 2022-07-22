@@ -8,8 +8,8 @@ public static class PicsumApi
     const string UserAgent = "My-User-Agent";
     const int RetryCount = int.MaxValue;
     const float RetryWait = 0.1f;
-    const int Width = 200;
-    const int Height = 200;
+    const int Width = 320;
+    const int Height = 240;
 
 
     public static IEnumerator LoadCard(Card card)

@@ -1,68 +1,95 @@
-Shader "CardShader"
+Shader "CardShader" 
 {
     Properties
     {
-        _BaseMap("Base Map", 2D) = "white"
+        _MainTex("Main Texture", 2D) = "white" { }
+        _FrontTex("Front Texture", 2D) = "white" { }
+        _BackTex("Back Texture", 2D) = "white" { }
+        _parallax("Parallax", Float) = 0.5
     }
-
-        SubShader
+    SubShader
     {
-        Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalRenderPipeline" }
+        Tags {"Queue" = "Transparent" "RenderType" = "Transparent" "RenderPipeline" = "UniversalPipeline" }
+
+        Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off
+        ZWrite Off
 
         Pass
         {
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma target 3.0
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"            
+            #include "UnityCG.cginc"
 
-            struct Attributes
+            sampler2D _MainTex;
+            sampler2D _FrontTex;
+            sampler2D _BackTex;
+
+            float _parallax;
+
+            struct v2f
             {
-                float4 positionOS   : POSITION;
-                // The uv variable contains the UV coordinate on the texture for the
-                // given vertex.
-                float2 uv           : TEXCOORD0;
+                float4 pos : SV_POSITION;
+                float2 uv : TEXCOORD0;
+                float3 normal : NORMAL  ;
             };
 
-            struct Varyings
+            float4 _MainTex_ST;
+
+            v2f vert(appdata_base v)
             {
-                float4 positionHCS  : SV_POSITION;
-                // The uv variable contains the UV coordinate on the texture for the
-                // given vertex.
-                float2 uv           : TEXCOORD0;
-            };
-
-            // This macro declares _BaseMap as a Texture2D object.
-            TEXTURE2D(_BaseMap);
-            // This macro declares the sampler for the _BaseMap texture.
-            SAMPLER(sampler_BaseMap);
-
-            CBUFFER_START(UnityPerMaterial)
-                // The following line declares the _BaseMap_ST variable, so that you
-                // can use the _BaseMap variable in the fragment shader. The _ST 
-                // suffix is necessary for the tiling and offset function to work.
-                float4 _BaseMap_ST;
-            CBUFFER_END
-
-            Varyings vert(Attributes IN)
-            {
-                Varyings OUT;
-                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
-                // The TRANSFORM_TEX macro performs the tiling and offset
-                // transformation.
-                OUT.uv = TRANSFORM_TEX(IN.uv, _BaseMap);
-                return OUT;
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex);
+                o.uv = v.texcoord;
+                o.normal = mul(unity_ObjectToWorld, v.normal);
+                return o;
             }
 
-            half4 frag(Varyings IN) : SV_Target
+            fixed4 frag(v2f i, float facing : VFACE) : SV_Target
             {
-                // The SAMPLE_TEXTURE2D marco samples the texture with the given
-                // sampler.
-                half4 color = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv);
-                return color;
+                const float fromX = 0.07;
+                const float toX = 0.93;
+                const float fromY = 0.439;
+                const float toY = 0.892;
+
+                float scaleX = 1 / (toX - fromX);
+                float scaleY = 1 / (toY - fromY);
+
+                float3x3 uv_im_trans = float3x3(scaleX, 0.0, -fromX * scaleX, 0.0, scaleY, -fromY * scaleY, 0.0, 0.0, 1.0);
+
+                float4 c;
+
+                if (facing >= 0)
+                {
+                    c = tex2D(_FrontTex, i.uv);
+
+                    float2 parallax = normalize(mul(UNITY_MATRIX_V, i.normal * -1)).xy;
+
+                    float2 uv_img = mul(uv_im_trans, float3(i.uv.xy, 1.0));
+
+                    float2 uv_img_parallax = (uv_img - 0.5) / (_parallax + 1.0) + 0.5 - parallax * _parallax / 2.5;
+
+                    if (uv_img.x > 0 && uv_img.x < 1 &&
+                        uv_img.y > 0 && uv_img.y < 1)
+                    {
+                        c += tex2D(_MainTex, uv_img_parallax) * (1 - c.a);
+                        c.a = 1;
+                    }
+
+                }
+                else
+                {
+                    i.uv.x *= -1;
+                    c = tex2D(_BackTex, i.uv);
+                }
+
+                return c;
             }
             ENDHLSL
+
         }
     }
 }
