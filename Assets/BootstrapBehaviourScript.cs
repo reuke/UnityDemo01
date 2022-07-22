@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class BootstrapBehaviourScript : MonoBehaviour
 {
     const int cardsCount = 5;
-    const float cardsSpacingMultiplier = 2;
+    const float cardsSpacingMultiplier = 1.1f;
 
     private List<Card> cards = new List<Card>(cardsCount);
     private Button loadButton;

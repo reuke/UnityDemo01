@@ -17,9 +17,9 @@ public class Card
         Vector3[] vertices = new Vector3[4]
         {
             new Vector3(Width / -2, Height / -2, 0),
-            new Vector3(Width, Height / -2, 0),
-            new Vector3(Width / -2, Height, 0),
-            new Vector3(Width, Height, 0)
+            new Vector3(Width / 2, Height / -2, 0),
+            new Vector3(Width / -2, Height / 2, 0),
+            new Vector3(Width / 2, Height / 2, 0)
         };
         mesh.vertices = vertices;
 
