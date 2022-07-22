@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using UnityEngine.UI;
 public class BootstrapBehaviourScript : MonoBehaviour
 {
     const int cardsCount = 5;
-    const float cardsSpacingMultiplier = 1.1f;
+    const float cardsSpacingMultiplier = 1.2f;
 
     private List<Card> cards = new List<Card>(cardsCount);
     private Button loadButton;
@@ -30,6 +31,9 @@ public class BootstrapBehaviourScript : MonoBehaviour
         stopButton.onClick.AddListener(OnStopButtonClick);
 
         modeSelectionDropdown = GameObject.Find("ModeSelectionDropdown").GetComponent<Dropdown>();
+
+        DOTween.Init();
+        DOTween.defaultEaseType = Ease.InOutQuad;
     }
 
     void Start()

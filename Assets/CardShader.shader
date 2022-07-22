@@ -5,7 +5,7 @@ Shader "CardShader"
         _MainTex("Main Texture", 2D) = "white" { }
         _FrontTex("Front Texture", 2D) = "white" { }
         _BackTex("Back Texture", 2D) = "white" { }
-        _parallax("Parallax", Float) = 0.5
+        _parallax("Parallax", Float) = 0.6
     }
     SubShader
     {
