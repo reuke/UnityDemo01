@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class Card
 {
@@ -10,6 +11,9 @@ public class Card
     private GameObject quadGameObject;
     private Material material;
 
+    private bool isFrontSideCurrent = false;
+    private bool isFrontSideRequired = false;
+    private bool isFlippingRightNow = false;
     public Card()
     {
         var mesh = new Mesh();
@@ -57,6 +61,8 @@ public class Card
 
         var meshFilter = quadGameObject.AddComponent<MeshFilter>();
         meshFilter.mesh = mesh;
+
+        quadGameObject.transform.eulerAngles = new Vector3(0, -180, 0);
     }
 
     public Vector3 Position
@@ -73,5 +79,69 @@ public class Card
     public void SetTexture(Texture texture)
     {
         material.SetTexture("_MainTex", texture);
+    }
+
+    public bool IsFrontSide
+    {
+        get => isFrontSideRequired;
+        set
+        {
+            isFrontSideRequired = value;
+            if (!isFlippingRightNow)
+            {
+                StartFlipIfRequired();
+            }
+        }
+    }
+
+    private void StartFlipIfRequired()
+    {
+        isFlippingRightNow = false;
+        if (isFrontSideCurrent != isFrontSideRequired)
+        {
+            isFlippingRightNow = true;
+            if(isFrontSideRequired)
+            {
+                ShowFrontSide();
+            }
+            else
+            {
+                ShowBackSide();
+            }
+        }
+    }
+
+    const float FlipTime = 0.3f;
+    const float FlipRaiseScale = 0.66f;
+
+    private void ShowFrontSide()
+    {
+        var sequence = DOTween.Sequence();
+        sequence.Insert(0, quadGameObject.transform.DORotate(new Vector3(0, 360, 0), FlipTime, RotateMode.FastBeyond360));
+
+        var vectorToCamera = Vector3.Normalize(Camera.main.transform.position - quadGameObject.transform.position);
+        sequence.Insert(0, quadGameObject.transform.DOMove(quadGameObject.transform.position + vectorToCamera * Width * FlipRaiseScale, FlipTime / 2));
+        sequence.Insert(FlipTime / 2, quadGameObject.transform.DOMove(quadGameObject.transform.position, FlipTime / 2));
+
+        sequence.onComplete += () =>
+        {
+            isFrontSideCurrent = true;
+            StartFlipIfRequired();
+        };
+    }
+    private void ShowBackSide()
+    {
+        var sequence = DOTween.Sequence();
+        sequence.Insert(0, quadGameObject.transform.DORotate(new Vector3(0, 180, 0), FlipTime));
+
+        var vectorToCamera = Vector3.Normalize(Camera.main.transform.position - quadGameObject.transform.position);
+        sequence.Insert(0, quadGameObject.transform.DOMove(quadGameObject.transform.position + vectorToCamera * Width * FlipRaiseScale, FlipTime / 2));
+        sequence.Insert(FlipTime / 2, quadGameObject.transform.DOMove(quadGameObject.transform.position, FlipTime / 2));
+
+        sequence.onComplete += () =>
+        {
+            isFrontSideCurrent = false;
+            StartFlipIfRequired();
+        };
     }
 }
