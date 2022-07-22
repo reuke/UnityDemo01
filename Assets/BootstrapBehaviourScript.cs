@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -67,19 +68,98 @@ public class BootstrapBehaviourScript : MonoBehaviour
 
     public void OnLoadButtonClick()
     {
-        Debug.Log("OnLoadButtonClick");
-        var selectedMode = (LoadingMode)modeSelectionDropdown.value;
-        Debug.Log(selectedMode);
-
-        foreach (var card in cards)
+        if ((LoadingMode)modeSelectionDropdown.value == LoadingMode.AllAtOnce)
         {
-            StartCoroutine(PicsumApi.LoadCard(card));
+            runningCoroutines.Add(StartCoroutine(LoadAllAtOnce()));
         }
+        else if ((LoadingMode)modeSelectionDropdown.value == LoadingMode.OneByOne)
+        {
+            runningCoroutines.Add(StartCoroutine(LoadOneByOne()));
+        }
+        else if ((LoadingMode)modeSelectionDropdown.value == LoadingMode.WhenImageReady)
+        {
+            runningCoroutines.Add(StartCoroutine(LoadWhenImageReady()));
+        }
+
+        UpdateButtons();
     }
+
+    private List<Coroutine> runningCoroutines = new List<Coroutine>();
 
     public void OnStopButtonClick()
     {
-        Debug.Log("OnStopButtonClick");
+        foreach (var runningCoroutine in runningCoroutines)
+        {
+            StopCoroutine(runningCoroutine);
+        }
+        runningCoroutines.Clear();
+        UpdateButtons();
+    }
+
+    private void UpdateButtons()
+    {
+        loadButton.enabled = !runningCoroutines.Any();
+        stopButton.enabled = !loadButton.enabled;
+        modeSelectionDropdown.enabled = loadButton.enabled;
+    }
+
+    private IEnumerator LoadAllAtOnce()
+    {
+        cards.ForEach(t => t.IsFrontSide = false);
+
+        var cardsCoroutines = cards
+            .Select(t => StartCoroutine(PicsumApi.LoadCard(t)))
+            .ToArray();
+
+        runningCoroutines.AddRange(cardsCoroutines);
+
+        foreach (var coroutine in cardsCoroutines)
+            yield return coroutine;
+
+        cards.ForEach(t => t.IsFrontSide = true);
+
+        runningCoroutines.Clear();
+        UpdateButtons();
+    }
+
+    private IEnumerator LoadOneByOne()
+    {
+        cards.ForEach(t => t.IsFrontSide = false);
+
+        foreach (var card in cards)
+        {
+            var coroutine = StartCoroutine(PicsumApi.LoadCard(card));
+            runningCoroutines.Add(coroutine);
+            yield return coroutine;
+            card.IsFrontSide = true;
+        }
+
+        runningCoroutines.Clear();
+        UpdateButtons();
+    }
+
+    private IEnumerator LoadWhenImageReady()
+    {
+        cards.ForEach(t => t.IsFrontSide = false);
+
+        var cardsCoroutines = cards.Select(t => StartCoroutine(LoadWhenImageReady(t))).ToArray();
+
+        foreach (var coroutine in cardsCoroutines)
+            runningCoroutines.Add(coroutine);
+
+        foreach (var coroutine in cardsCoroutines)
+            yield return coroutine;
+
+        runningCoroutines.Clear();
+        UpdateButtons();
+    }
+
+    private IEnumerator LoadWhenImageReady(Card card)
+    {
+        var coroutine = StartCoroutine(PicsumApi.LoadCard(card));
+        runningCoroutines.Add(coroutine);
+        yield return coroutine;
+        card.IsFrontSide = true;
     }
 }
 
