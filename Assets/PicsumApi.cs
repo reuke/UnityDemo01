@@ -14,6 +14,8 @@ public static class PicsumApi
 
     public static IEnumerator LoadCard(Card card)
     {
+        yield return new WaitForSeconds(0.05f);
+
         var request = UnityWebRequestTexture.GetTexture($"https://picsum.photos/{Width}/{Height}");
 
         var retry = -1;

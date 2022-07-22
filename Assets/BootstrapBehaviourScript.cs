@@ -17,6 +17,11 @@ public class BootstrapBehaviourScript : MonoBehaviour
 
     void Awake()
     {
+        DOTween.Init();
+        DOTween.defaultEaseType = Ease.InOutQuad;
+
+        TextureHelpers.InitFrontTextures();
+
         for (int i = 0; i < cardsCount; i++)
         {
             var card = new Card();
@@ -31,9 +36,6 @@ public class BootstrapBehaviourScript : MonoBehaviour
         stopButton.onClick.AddListener(OnStopButtonClick);
 
         modeSelectionDropdown = GameObject.Find("ModeSelectionDropdown").GetComponent<Dropdown>();
-
-        DOTween.Init();
-        DOTween.defaultEaseType = Ease.InOutQuad;
     }
 
     void Start()

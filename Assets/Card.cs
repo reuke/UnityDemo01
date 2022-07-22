@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System.Linq;
 
 public class Card
 {
@@ -14,6 +15,7 @@ public class Card
     private bool isFrontSideCurrent = false;
     private bool isFrontSideRequired = false;
     private bool isFlippingRightNow = false;
+
     public Card()
     {
         var mesh = new Mesh();
@@ -55,6 +57,7 @@ public class Card
         quadGameObject = new GameObject();
         material = new Material(Shader.Find("CardShader"));
         material.EnableKeyword("_MainTex");
+        material.EnableKeyword("_FrontTex");
 
         var meshRenderer = quadGameObject.AddComponent<MeshRenderer>();
         meshRenderer.material = material;
@@ -76,9 +79,10 @@ public class Card
             quadGameObject.transform.position = value;
         }
     }
-    public void SetTexture(Texture texture)
+    public void SetTexture(Texture2D texture)
     {
         material.SetTexture("_MainTex", texture);
+        material.SetTexture("_FrontTex", TextureHelpers.GetClosestByColorFrontTexture(texture));
     }
 
     public bool IsFrontSide
