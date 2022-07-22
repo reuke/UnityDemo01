@@ -49,7 +49,7 @@ public class Card
         mesh.uv = uv;
 
         quadGameObject = new GameObject();
-        material = new Material(Shader.Find("Custom/CardSurfaceShader"));
+        material = new Material(Shader.Find("CardShader"));
 
         var meshRenderer = quadGameObject.AddComponent<MeshRenderer>();
         meshRenderer.material = material;
@@ -68,5 +68,10 @@ public class Card
         {
             quadGameObject.transform.position = value;
         }
+    }
+    public void SetTexture(Texture texture)
+    {
+        material.EnableKeyword("_BaseMap");
+        material.SetTexture("_BaseMap", texture);
     }
 }

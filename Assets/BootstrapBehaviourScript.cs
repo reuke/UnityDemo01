@@ -45,6 +45,11 @@ public class BootstrapBehaviourScript : MonoBehaviour
         Debug.Log("OnLoadButtonClick");
         var selectedMode = (LoadingMode)modeSelectionDropdown.value;
         Debug.Log(selectedMode);
+
+        foreach (var card in cards)
+        {
+            StartCoroutine(PicsumApi.LoadCard(card));
+        }
     }
 
     public void OnStopButtonClick()
