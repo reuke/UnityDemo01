@@ -58,6 +58,7 @@ public class Card
         material = new Material(Shader.Find("CardShader"));
         material.EnableKeyword("_MainTex");
         material.EnableKeyword("_FrontTex");
+        material.EnableKeyword("_LightComponent");
 
         var meshRenderer = quadGameObject.AddComponent<MeshRenderer>();
         meshRenderer.material = material;
@@ -66,6 +67,7 @@ public class Card
         meshFilter.mesh = mesh;
 
         quadGameObject.transform.eulerAngles = new Vector3(0, -180, 0);
+        material.SetFloat("_LightComponent", FlipBackSideValue);
     }
 
     public Vector3 Position
@@ -116,6 +118,8 @@ public class Card
     }
 
     const float FlipTime = 0.3f;
+    const float FlipFrontSideValue = 0.05f;
+    const float FlipBackSideValue = 0.3f;
     const float FlipRaiseScale = 0.66f;
 
     private void ShowFrontSide()
@@ -126,6 +130,10 @@ public class Card
         var vectorToCamera = Vector3.Normalize(Camera.main.transform.position - quadGameObject.transform.position);
         sequence.Insert(0, quadGameObject.transform.DOMove(quadGameObject.transform.position + vectorToCamera * Width * FlipRaiseScale, FlipTime / 2));
         sequence.Insert(FlipTime / 2, quadGameObject.transform.DOMove(quadGameObject.transform.position, FlipTime / 2));
+
+        //sequence.Insert(0, material.DOFloat(1.0f, "_LightComponent", FlipTime / 2));
+        //sequence.Insert(FlipTime / 2, material.DOFloat(0.0f, "_LightComponent", FlipTime / 2));
+        sequence.Insert(0, material.DOFloat(FlipFrontSideValue, "_LightComponent", FlipTime));
 
         sequence.onComplete += () =>
         {
@@ -141,6 +149,8 @@ public class Card
         var vectorToCamera = Vector3.Normalize(Camera.main.transform.position - quadGameObject.transform.position);
         sequence.Insert(0, quadGameObject.transform.DOMove(quadGameObject.transform.position + vectorToCamera * Width * FlipRaiseScale, FlipTime / 2));
         sequence.Insert(FlipTime / 2, quadGameObject.transform.DOMove(quadGameObject.transform.position, FlipTime / 2));
+
+        sequence.Insert(0, material.DOFloat(FlipBackSideValue, "_LightComponent", FlipTime));
 
         sequence.onComplete += () =>
         {
