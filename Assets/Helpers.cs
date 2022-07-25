@@ -4,7 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using System.Linq;
 
-public class TextureHelpers
+public class Helpers
 {
     public static Texture2D BackTexture;
 
@@ -83,5 +83,46 @@ public class TextureHelpers
         }
 
         return frontTextures[maxValueIndex];
+    }
+
+    public static Mesh GetMesh(float width, float height)
+    {
+        var mesh = new Mesh();
+
+        Vector3[] vertices = new Vector3[4]
+        {
+            new Vector3(width / -2, height / -2, 0),
+            new Vector3(width / 2, height / -2, 0),
+            new Vector3(width / -2, height / 2, 0),
+            new Vector3(width / 2, height / 2, 0)
+        };
+        mesh.vertices = vertices;
+
+        int[] tris = new int[6]
+        {
+            0, 2, 1,
+            2, 3, 1
+        };
+        mesh.triangles = tris;
+
+        Vector3[] normals = new Vector3[4]
+        {
+            -Vector3.forward,
+            -Vector3.forward,
+            -Vector3.forward,
+            -Vector3.forward
+        };
+        mesh.normals = normals;
+
+        Vector2[] uv = new Vector2[4]
+        {
+            new Vector2(0, 0),
+            new Vector2(1, 0),
+            new Vector2(0, 1),
+            new Vector2(1, 1)
+        };
+        mesh.uv = uv;
+
+        return mesh;
     }
 }

@@ -18,41 +18,7 @@ public class Card
 
     public Card()
     {
-        var mesh = new Mesh();
-
-        Vector3[] vertices = new Vector3[4]
-        {
-            new Vector3(Width / -2, Height / -2, 0),
-            new Vector3(Width / 2, Height / -2, 0),
-            new Vector3(Width / -2, Height / 2, 0),
-            new Vector3(Width / 2, Height / 2, 0)
-        };
-        mesh.vertices = vertices;
-
-        int[] tris = new int[6]
-        {
-            0, 2, 1,
-            2, 3, 1
-        };
-        mesh.triangles = tris;
-
-        Vector3[] normals = new Vector3[4]
-        {
-            -Vector3.forward,
-            -Vector3.forward,
-            -Vector3.forward,
-            -Vector3.forward
-        };
-        mesh.normals = normals;
-
-        Vector2[] uv = new Vector2[4]
-        {
-            new Vector2(0, 0),
-            new Vector2(1, 0),
-            new Vector2(0, 1),
-            new Vector2(1, 1)
-        };
-        mesh.uv = uv;
+        var mesh = Helpers.GetMesh(Width, Height);
 
         quadGameObject = new GameObject();
         material = new Material(Shader.Find("CardShader"));
@@ -60,7 +26,7 @@ public class Card
         material.EnableKeyword("_BackTex");
         material.EnableKeyword("_FrontTex");
         material.EnableKeyword("_LightComponent");
-        material.SetTexture("_BackTex", TextureHelpers.BackTexture);
+        material.SetTexture("_BackTex", Helpers.BackTexture);
 
         var meshRenderer = quadGameObject.AddComponent<MeshRenderer>();
         meshRenderer.material = material;
@@ -86,7 +52,7 @@ public class Card
     public void SetTexture(Texture2D texture)
     {
         material.SetTexture("_MainTex", texture);
-        material.SetTexture("_FrontTex", TextureHelpers.GetClosestByColorFrontTexture(texture));
+        material.SetTexture("_FrontTex", Helpers.GetClosestByColorFrontTexture(texture));
     }
 
     public bool IsFrontSide

@@ -20,7 +20,7 @@ public class BootstrapBehaviourScript : MonoBehaviour
         DOTween.Init();
         DOTween.defaultEaseType = Ease.InOutQuad;
 
-        TextureHelpers.InitFrontTextures();
+        Helpers.InitFrontTextures();
 
         for (int i = 0; i < cardsCount; i++)
         {
@@ -40,7 +40,6 @@ public class BootstrapBehaviourScript : MonoBehaviour
 
     void Start()
     {
-        RenderSettings.skybox = null;
         StartCoroutine(OnAspectChangedCoroutine());
         UpdateButtons();
     }
