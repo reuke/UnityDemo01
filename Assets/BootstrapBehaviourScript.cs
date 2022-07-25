@@ -40,12 +40,9 @@ public class BootstrapBehaviourScript : MonoBehaviour
 
     void Start()
     {
+        RenderSettings.skybox = null;
         StartCoroutine(OnAspectChangedCoroutine());
-    }
-
-    void Update()
-    {
-
+        UpdateButtons();
     }
 
     private float cameraAspect = 0.0f;
@@ -59,7 +56,7 @@ public class BootstrapBehaviourScript : MonoBehaviour
                 AdjustCameraToFitCards();
                 cameraAspect = Camera.main.aspect;
             }
-            yield return new WaitForSeconds(.2f);
+            yield return new WaitForSeconds(0.2f);
         }
     }
 
@@ -104,9 +101,9 @@ public class BootstrapBehaviourScript : MonoBehaviour
 
     private void UpdateButtons()
     {
-        loadButton.enabled = !runningCoroutines.Any();
-        stopButton.enabled = !loadButton.enabled;
-        modeSelectionDropdown.enabled = loadButton.enabled;
+        loadButton.interactable = !runningCoroutines.Any();
+        stopButton.interactable = !loadButton.interactable;
+        modeSelectionDropdown.interactable = loadButton.interactable;
     }
 
     private IEnumerator LoadAllAtOnce()

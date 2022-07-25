@@ -6,12 +6,15 @@ using System.Linq;
 
 public class TextureHelpers
 {
+    public static Texture2D BackTexture;
 
     private static Texture2D[] frontTextures;
     private static Vector3[] frontTexturesColors;
 
     public static void InitFrontTextures()
     {
+        BackTexture = (Texture2D)Resources.Load("back");
+
         frontTextures = new Texture2D[]
         {
             (Texture2D)Resources.Load("black"),
@@ -58,9 +61,9 @@ public class TextureHelpers
             buckets[bucketIndex]++;
         }
 
-        // coefficients from test run
         var correctedBuckets = new float[buckets.Length];
 
+        // coefficients are from test run
         correctedBuckets[0] = buckets[0] * 1.0f;    // black
         correctedBuckets[1] = buckets[1] * 1.25f;   // white
         correctedBuckets[2] = buckets[2] * 7.5f;    // red

@@ -6,8 +6,8 @@ Shader "CardShader"
         _FrontTex("Front Texture", 2D) = "white" { }
         _BackTex("Back Texture", 2D) = "white" { }
         _Parallax("Parallax", Float) = 0.6
-        _SpecularShine("SpecularShine", Float) = 12
-        _LightComponent("LightComponent", Float) = 0.05
+        _SpecularShine("SpecularShine", Float) = 16
+        _LightComponent("LightComponent", Float) = 0
     }
     SubShader
     {
