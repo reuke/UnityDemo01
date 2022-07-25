@@ -11,9 +11,11 @@ public class BootstrapBehaviourScript : MonoBehaviour
     const float cardsSpacingMultiplier = 1.2f;
 
     private List<Card> cards = new List<Card>(cardsCount);
-    private Button loadButton;
-    private Button stopButton;
-    private Dropdown modeSelectionDropdown;
+
+    private static Button loadButton;
+    private static Button stopButton;
+    private static Dropdown modeSelectionDropdown;
+    private static Canvas mainCanvas;
 
     void Awake()
     {
@@ -36,6 +38,7 @@ public class BootstrapBehaviourScript : MonoBehaviour
         stopButton.onClick.AddListener(OnStopButtonClick);
 
         modeSelectionDropdown = GameObject.Find("ModeSelectionDropdown").GetComponent<Dropdown>();
+        mainCanvas = GameObject.Find("MainCanvas").GetComponent<Canvas>();
     }
 
     void Start()
@@ -65,7 +68,8 @@ public class BootstrapBehaviourScript : MonoBehaviour
         var frustumHeight = frustumWidth / Camera.main.aspect;
         var distance = frustumHeight * 0.5f / Mathf.Tan(Camera.main.fieldOfView * 0.5f * Mathf.Deg2Rad);
         Camera.main.transform.position = new Vector3(0.0f, 0.0f, distance * -1);
-        Camera.main.nearClipPlane = distance - Card.Width * 2;
+        Camera.main.farClipPlane = distance + Card.Width * 3;
+        mainCanvas.planeDistance = distance + Card.Width * 2;
     }
 
     public void OnLoadButtonClick()
